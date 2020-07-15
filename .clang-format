@@ -1,0 +1,28 @@
+BasedOnStyle: WebKit
+AlignOperands: true
+AlignAfterOpenBracket: Align
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: BeforeComma
+IndentWrappedFunctionNames: true
+MaxEmptyLinesToKeep: 2
+SortIncludes: false
+TabWidth: 8
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+ AfterClass: true
+ AfterEnum: false
+ AfterFunction: false
+ AfterNamespace: true
+ AfterStruct: false
