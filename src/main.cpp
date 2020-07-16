@@ -5,6 +5,8 @@ namespace po = boost::program_options;
 #include <iterator>
 #include <fmt/core.h>
 
+#include "classes/custom_formatter.hpp"
+
 int main(int argc, char* argv[]) {
     try {
         po::options_description descr("Allowed options");
@@ -18,8 +20,7 @@ int main(int argc, char* argv[]) {
         po::notify(varMap);
 
         if (varMap.count("help")) {
-            //fmt::print("{}", descr);              //  a formatter should be implemented for this: https://fmt.dev/latest/api.html#formatting-user-defined-types
-            std::cout << descr << "\n";
+            fmt::print("{}", descr);              
             return 0;
         }
 
