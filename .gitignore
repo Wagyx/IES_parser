@@ -3,5 +3,6 @@ build/
 lib/
 include/
 
+*.ies
 *.sln
 *.vcxproj*
