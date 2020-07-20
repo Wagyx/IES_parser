@@ -1,15 +1,11 @@
 #include "ies_document.hpp"
 
-IES_Document::IES_Document(const std::string& path) {
+IES_Document::IES_Document(std::string& path) {
     read_IES(path.c_str());
 }
 
-IES_Document::IES_Document(const char* path) {
-    read_IES(path);
-}
-
-
 void IES_Document::read_IES(const char* path) {
+    
     try {
         std::ifstream     file(path);
         std::stringstream converter;
@@ -21,6 +17,16 @@ void IES_Document::read_IES(const char* path) {
     }
     filename = std::string(path);
     lines    = split_data(std::string_view(data), "\n");
+
+    unsigned int i;
+    for (i = 0; i < 2; ++i) {
+        if (lines[0] == format_identifier[i]) {
+            standard = IES_Standard(i);
+            return;
+        }
+    }
+    standard = IES_Standard(i);
+    return;
 }
 
 // clang-format off
@@ -29,20 +35,32 @@ std::vector<std::string_view> IES_Document::split_data(const std::string_view& d
 
     size_t it = 0;
 
-    while (it < data.size()) {                                  //Search the whole string
-        size_t next = data.find(delimiter, it);                 //Find the delimiter from the next character
+    while (it < data.size()) {                                                      //Search the whole string
+        size_t next = data.find(delimiter, it);                                     //Find the delimiter from the next character
 
-        std::string_view line(data.substr(it, (next - it)));    //Take the substring from current iterator to the delimiter
-        if (line != "") {                                       //Filter empty lines
-            storage.push_back(line);
-        }
-
-        it = next + 1;                                          //Continue searching the whole string from there on
+        std::string_view line(data.substr(it, (next - it)));                        //Take the substring from current iterator to the delimiter
+        storage.push_back(line);
+        it = next + 1;                                                              //Continue searching the whole string from there on
     }
+
+    storage = std::vector(storage.begin(),                                          //Filter empty lines
+                            std::remove_if(storage.begin(), storage.end(), 
+                            [](auto x){return x == "";}));                          
 
     return storage;
 };
 // clang-format on
+
+std::string IES_Document::get_standard() {
+    switch (standard) {
+    case IES_Standard::IES91:
+        return "IES 1991";
+    case IES_Standard::IES95:
+        return "IES 1995";
+    default:
+        return "IES 1986";
+    };
+}
 
 std::string_view IES_Document::operator[](unsigned int line) {
     return lines.at(line);
