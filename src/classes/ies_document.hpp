@@ -1,11 +1,12 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <iterator>
-#include <sstream>
-#include <array>
+#include <memory>
 #include <string>
+#include <sstream>
 #include <string_view>
 #include <vector>
 
@@ -20,12 +21,12 @@ public:
     std::string filename;
 
     IES_Document(std::string& path);
-    std::string      get_standard();
-
-    std::string_view operator[](unsigned int line);
+    std::string                          get_standard() const;
+    const std::vector<std::string_view>& get_lines() const;
+    std::string_view                     operator[](unsigned int line) const;
 
 private:
-    const std::array<const char*, 2> format_identifier {"IESNA:LM-63-1995", "IESNA91"};
+    const std::array<const char*, 2> format_identifier { "IESNA:LM-63-1995", "IESNA91" };
 
     std::string                   data;
     std::vector<std::string_view> lines;

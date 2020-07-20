@@ -7,11 +7,7 @@ namespace po = boost::program_options;
 #include "classes/ies_parser.hpp"
 
 int main(int argc, char* argv[]) {
-    IES_Parser* parser = new IES95_Parser();
-    IES91_Parser* parser91 = new IES91_Parser();
-    IES86_Parser* parser86 = new IES86_Parser();
-    parser->to(parser91)->to(parser86);
-
+    IES_Parser parser;
     try {
         po::options_description descr("Allowed options:");
         descr.add_options()("help", "producing help message")("target", po::value<std::string>(), "specifying the file to be parsed")("print-to", po::value<std::string>(), "specifying where the parsing result should be printed to");
@@ -32,7 +28,7 @@ int main(int argc, char* argv[]) {
             auto c = varMap["target"].as<std::string>();
 
             IES_Document doc(c);
-            parser->parse(doc);
+            parser.parse(doc);
             
         } else {
             fmt::print("No target to parse was specified.\n");
@@ -48,10 +44,6 @@ int main(int argc, char* argv[]) {
     } catch (...) {
         fmt::print("UNHANDLED ERROR /!\\\n");
     }
-
-    delete parser;
-    delete parser86;
-    delete parser91;
 
     return 0;
 }

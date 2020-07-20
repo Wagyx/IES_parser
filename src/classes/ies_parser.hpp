@@ -1,72 +1,24 @@
-#include "ies_document.hpp"
+#include "ies86_parser.hpp"
+#include "ies91_parser.hpp"
+#include "ies95_parser.hpp"
 
-class Abstract_IES_Parser
+class IES_Parser
 {
-public:
-    virtual Abstract_IES_Parser* to(Abstract_IES_Parser* next_parser) = 0;
-
-    virtual void parse(IES_Document& document) = 0;
-};
-
-class IES_Parser : public Abstract_IES_Parser
-{
-public:
-    IES_Parser()
-        : next(nullptr) { }
-
-    Abstract_IES_Parser* to(Abstract_IES_Parser* next_parser) override {
-        next = next_parser;
-        return next_parser;
-    }
-
-    void parse(IES_Document& document) override {
-        if (next != nullptr) {
-            return next->parse(document);
-        } else {
-            fmt::print("No parsing implementations were found.\n");
-            return;
-        }
-    }
-
 private:
-    Abstract_IES_Parser* next;
-};
+    std::unique_ptr<Concrete_IES_Parser> parser;
 
-class IES95_Parser : public IES_Parser
-{
 public:
-    void parse(IES_Document& document) override {
-        if (document.get_standard() == "IES 1995") {
-            //Do the parsing
-            fmt::print("Parsing as {}", document.get_standard());
-        } else {
-            return IES_Parser::parse(document);
-        }
+    IES_Parser() {
+        parser = std::make_unique<IES95_Parser>();
+
+        //std::unique_ptr<IES91_Parser> parser91 = std::make_unique<IES91_Parser>();
+        //std::unique_ptr<IES86_Parser> parser86 = std::make_unique<IES86_Parser>();
+        //parser->to(std::move(parser91))->to(std::move(parser86));
+        
+        parser->to(std::make_unique<IES91_Parser>())->to(std::make_unique<IES86_Parser>());
     }
-};
 
-class IES91_Parser : public IES_Parser
-{
-public:
-    void parse(IES_Document& document) override {
-        if (document.get_standard() == "IES 1991") {
-            //Do the parsing
-            fmt::print("Parsing as {}", document.get_standard());
-        } else {
-            return IES_Parser::parse(document);
-        }
-    }
-};
-
-class IES86_Parser : public IES_Parser
-{
-public:
-    void parse(IES_Document& document) override {
-        if (document.get_standard() == "IES 1986") {
-            //Do the parsing
-            fmt::print("Parsing as {}", document.get_standard());
-        } else {
-            fmt::print("< ERROR > Cannot parse this document.\n");
-        }
+    void parse(IES_Document& document) {
+        parser->parse(document);
     }
 };
