@@ -20,6 +20,8 @@ class IES_Document
 public:
     std::string filename;
 
+    std::unordered_map<std::string_view, std::vector<std::string_view>> labels;     //  TODO: it would be nice to have a wrapper around this
+
     IES_Document(std::string& path);
     std::string                          get_standard() const;
     const std::vector<std::string_view>& get_lines() const;

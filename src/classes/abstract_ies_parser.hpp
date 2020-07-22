@@ -41,12 +41,12 @@ protected:
 
     virtual void parse_process(IES_Document& document) {
         find_reference_lines(document);
-        parse_label();
+        parse_label(document);
         //metodo 3
     }
 
     virtual void find_first_label_line(const IES_Document& document) = 0;
-    virtual void parse_label() = 0;
+    virtual void parse_label(IES_Document& document)           = 0;
 
 private:
 

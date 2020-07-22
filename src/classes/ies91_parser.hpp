@@ -16,4 +16,8 @@ public:
     void find_first_label_line(const IES_Document& document) final override {
         label_line = document.get_lines().cbegin() + 1;
     }
+
+    void parse_label(IES_Document& document) {
+
+    }
 };
