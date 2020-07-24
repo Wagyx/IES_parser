@@ -8,7 +8,7 @@ public:
     void parse(IES_Document& document) override {
         if (document.get_standard() == "IES 1991") {
             //Do the parsing
-            fmt::print("Parsing as {}", document.get_standard());
+            fmt::print("Parsing as {}\n", document.get_standard());
             parse_process(document);
         } else {
             return Concrete_IES_Parser::parse(document);

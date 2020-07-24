@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
             IES_Document doc(c);
             parser.parse(doc);
-            
+
         } else {
             fmt::print("No target to parse was specified.\n");
         }

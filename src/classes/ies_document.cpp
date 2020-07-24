@@ -51,8 +51,10 @@ std::vector<std::string_view> IES_Document::split_data(const std::string_view& d
 };
 // clang-format on
 
-std::string IES_Document::get_standard() const {
+const std::string IES_Document::get_standard() const {
     switch (standard) {
+    case IES_Standard::IES02:
+        return "IES 2002";
     case IES_Standard::IES91:
         return "IES 1991";
     case IES_Standard::IES95:
@@ -68,4 +70,16 @@ std::string_view IES_Document::operator[](unsigned int line) const{
 
 const std::vector<std::string_view>& IES_Document::get_lines() const {
     return lines;
+}
+
+const bool IES_Document::has_tilt() const {
+    if ((tilt == IES_TILT::Unhandled) || (tilt == IES_TILT::NONE)) {
+        return false;
+    } else {
+        return static_cast<bool>(tilt);
+    }
+}
+
+std::optional<TILT_Data>& IES_Document::get_tilt_data() {
+    return tilt_data;
 }
