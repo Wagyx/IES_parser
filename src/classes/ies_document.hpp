@@ -24,11 +24,43 @@ enum struct IES_TILT_Orientation : unsigned int { Vertical           = 1,
                                                   AlwaysHorizontal   = 2,
                                                   NoRotateHorizontal = 3 };
 
+enum struct IES_UnitType : unsigned int { Feet   = 1,
+                                          Meters = 2 };
+
+enum struct IES_PhotoType : unsigned int { TypeC = 1,
+                                           TypeB = 2,
+                                           TypeA = 3 };
+
 struct TILT_Data {
     IES_TILT_Orientation orientation;
     unsigned int         tilt_angles_num;
     std::vector<float>   tilt_angles;
     std::vector<float>   mult_factors;
+};
+
+struct Luminaire_Data {
+    unsigned int lamp_number;
+    float        avg_lumens_per_lamp;
+    float        lum_width;
+    float        lum_length;
+    float        lum_height;
+    IES_UnitType unit_type;
+    float         input_watts;
+};
+
+struct Photometric_Data {
+    float         candela_multiplier;
+    unsigned int  vertical_angles;
+    unsigned int  horizontal_angles;
+    IES_PhotoType photometric_type;
+    std::vector<float> v_angles_list;
+    std::vector<float> h_angles_list;
+    std::vector<float> candela;
+};
+
+struct Ballast_Data {
+    float b_factor;
+    float b_lamp_factor;
 };
 
 const std::unordered_map<std::string, IES_TILT> string_to_TILT_Value { { "NONE", IES_TILT::NONE },
@@ -40,9 +72,13 @@ public:
     std::string                                                         filename;
     std::unordered_map<std::string_view, std::vector<std::string_view>> labels; //  TODO: it would be nice to have a wrapper around this
     IES_TILT                                                            tilt;
+    Luminaire_Data                                                      luminaire_data;
+    Photometric_Data                                                    photometric_data;
+    Ballast_Data                                                        ballast_data;
 
     IES_Document(std::string& path);
 
+    const std::vector<std::string_view>::const_iterator end_of_document() const;
     [[nodiscard]] const std::string                    get_standard() const;
     [[nodiscard]] const std::vector<std::string_view>& get_lines() const;
     [[nodiscard]] const bool                           has_tilt() const;

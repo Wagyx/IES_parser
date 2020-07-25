@@ -19,7 +19,7 @@ void IES_Document::read_IES(const char* path) {
     lines    = split_data(std::string_view(data), "\n");
 
     unsigned int i;
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < 3; ++i) {
         if (lines[0] == format_identifier[i]) {
             standard = IES_Standard(i);
             return;
@@ -82,4 +82,8 @@ const bool IES_Document::has_tilt() const {
 
 std::optional<TILT_Data>& IES_Document::get_tilt_data() {
     return tilt_data;
+}
+
+const std::vector<std::string_view>::const_iterator IES_Document::end_of_document() const {
+    return lines.cend();
 }

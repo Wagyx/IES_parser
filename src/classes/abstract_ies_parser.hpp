@@ -15,6 +15,8 @@ public:
 
 class Concrete_IES_Parser : public Abstract_IES_Parser
 {
+    using string_view_vector = std::vector<std::string_view>;
+
 public:
     Concrete_IES_Parser()
         : next { nullptr } {};
@@ -36,15 +38,44 @@ public:
     std::unique_ptr<Abstract_IES_Parser> next;
 
 protected:
-    std::vector<std::string_view>::const_iterator label_line;
-    std::vector<std::string_view>::const_iterator tilt_line;
-    std::vector<std::string_view>::const_iterator data_line;
+    string_view_vector::const_iterator label_line;
+    string_view_vector::const_iterator tilt_line;
+    //string_view_vector::const_iterator data_line;
 
     virtual void parse_process(IES_Document& document) {
         find_reference_lines(document);
         parse_label(document);
         parse_tilt(document);
-        //metodo 3
+        parse_data(document);
+    }
+
+    template <typename T>
+    auto parse_element(const string_view_vector::const_iterator line) {
+        std::stringstream ss { std::string(*line) };
+        T                 result;
+        ss >> result;
+        return result;
+    }
+
+    template <typename T>
+    auto parse_elements(const size_t n, const string_view_vector::const_iterator line, const IES_Document& document) {
+        std::vector<T> result;
+        result.reserve(n);
+
+        const string_view_vector::const_iterator end_of_document { document.end_of_document() };
+        string_view_vector::const_iterator       current_line { line };
+        std::stringstream                        sstream { std::string(*current_line) };
+
+        while (result.size() < n) {
+            auto begin = std::istream_iterator<T>(sstream);
+            std::copy_n(begin, 1, std::back_inserter(result));
+            if (sstream.eof() && (current_line + 1) != end_of_document) {
+                ++current_line;
+                sstream = std::stringstream(std::string(*current_line));
+            }
+        }
+
+        return std::move(result);
     }
 
     virtual void find_first_label_line(const IES_Document& document) = 0;
@@ -79,34 +110,49 @@ private:
         }
 
         if (document.tilt == IES_TILT::INCLUDE) {
-            std::stringstream ss { std::string(*(tilt_line + 1)) };
+            unsigned int       orientation  = parse_element<unsigned int>(tilt_line + 1);
+            unsigned int       angles_num   = parse_element<unsigned int>(tilt_line + 2);
+            std::vector<float> tilt_angles  = parse_elements<float>(angles_num, tilt_line + 3, document);
+            std::vector<float> mult_factors = parse_elements<float>(angles_num, tilt_line + 4, document);
 
-            auto get_line_as_stream = [&](auto line) {
-                ss = std::stringstream { std::string(*line) };
-            };
+            TILT_Data extracted_data { IES_TILT_Orientation(orientation),
+                                       angles_num,
+                                       std::move(tilt_angles),
+                                       std::move(mult_factors) };
 
-            unsigned int orientation;
-            ss >> orientation;
-
-            get_line_as_stream(tilt_line + 2);
-            unsigned int angles_num;
-            ss >> angles_num;
-
-            get_line_as_stream(tilt_line + 3);
-            std::vector<float> tilt_angles(angles_num);
-            for (unsigned int i = 0; i < angles_num; ++i) {
-                ss >> tilt_angles.at(i);
-            }
-            
-            get_line_as_stream(tilt_line + 4);
-            std::vector<float> mult_factors(angles_num);
-            for (unsigned int i = 0; i < angles_num; ++i) {
-                ss >> mult_factors.at(i);
-            }
-            
-            TILT_Data extracted_data{ IES_TILT_Orientation(orientation), angles_num, std::move(tilt_angles), std::move(mult_factors) };
             document.get_tilt_data().emplace(std::move(extracted_data));
         }
+    }
+
+    void parse_data(IES_Document& document) {
+        string_view_vector::const_iterator header_line = (document.tilt == IES_TILT::INCLUDE) ? tilt_line + 5 : tilt_line + 1;
+
+        std::vector<float> header                    = parse_elements<float>(10, header_line, document);
+        document.luminaire_data.lamp_number          = std::move(static_cast<unsigned int>(header[0]));
+        document.luminaire_data.avg_lumens_per_lamp  = std::move(header[1]);
+        document.photometric_data.candela_multiplier = std::move(header[2]);
+        document.photometric_data.vertical_angles    = std::move(static_cast<unsigned int>(header[3]));
+        document.photometric_data.horizontal_angles  = std::move(static_cast<unsigned int>(header[4]));
+        document.photometric_data.photometric_type   = std::move(static_cast<IES_PhotoType>(header[5]));
+        document.luminaire_data.unit_type            = std::move(static_cast<IES_UnitType>(header[6]));
+        document.luminaire_data.lum_width            = std::move(header[7]);
+        document.luminaire_data.lum_length           = std::move(header[8]);
+        document.luminaire_data.lum_height           = std::move(header[9]);
+
+        std::vector<float> ballast_and_watts = parse_elements<float>(5, header_line + 1, document);
+        document.ballast_data.b_factor       = std::move(ballast_and_watts[0]);
+        document.ballast_data.b_lamp_factor  = std::move(ballast_and_watts[1]);
+        document.luminaire_data.input_watts  = std::move(ballast_and_watts[2]);
+
+        unsigned int v { document.photometric_data.vertical_angles };
+        unsigned int h { document.photometric_data.horizontal_angles };
+        std::vector<float> data = parse_elements<float>(v + h + v * h, header_line + 2, document);
+        std::transform(data.begin(), data.end(), data.begin(),
+            [&](auto x) { return x * document.photometric_data.candela_multiplier * document.ballast_data.b_factor * document.ballast_data.b_lamp_factor; });
+        std::move(data.begin(), data.begin() + v, std::back_inserter(document.photometric_data.v_angles_list));
+        std::move(data.begin() + v, data.begin() + v + h, std::back_inserter(document.photometric_data.h_angles_list));
+        std::move(data.begin() + v + h, data.end(), std::back_inserter(document.photometric_data.candela));
+
     }
 };
 

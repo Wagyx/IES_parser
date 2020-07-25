@@ -6,5 +6,6 @@ doc/
 
 Doxyfile
 *.ies
+*.csv
 *.sln
 *.vcxproj*
