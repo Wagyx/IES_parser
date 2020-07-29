@@ -1,15 +1,19 @@
-#include <fmt/format.h>
-
+#pragma once
 #include <algorithm>
 #include <array>
 #include <fstream>
 #include <iterator>
 #include <memory>
+#include <numeric>
 #include <optional>
 #include <string>
 #include <sstream>
 #include <string_view>
 #include <vector>
+
+#include <fmt/format.h>
+#include <fmt/color.h>
+
 
 enum struct IES_Standard : unsigned int { IES86 = 3,
                                           IES91 = 2,
@@ -82,6 +86,8 @@ public:
     [[nodiscard]] const std::string                    get_standard() const;
     [[nodiscard]] const std::vector<std::string_view>& get_lines() const;
     [[nodiscard]] const bool                           has_tilt() const;
+    [[nodiscard]] std::string                          get_unit_type() const;
+    [[nodiscard]] std::string                          get_photometric_type() const;
     [[nodiscard]] std::optional<TILT_Data>&            get_tilt_data();
     [[nodiscard]] std::string_view                     operator[](unsigned int line) const;
 

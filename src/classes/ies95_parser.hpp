@@ -7,7 +7,6 @@ public:
         auto standard = document.get_standard();
         if (standard == "IES 1995" || standard == "IES 2002") {
             //Do the parsing
-            fmt::print("Parsing as {}\n", document.get_standard());
             parse_process(document);
 
         } else {

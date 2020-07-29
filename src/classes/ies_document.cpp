@@ -13,8 +13,9 @@ void IES_Document::read_IES(const char* path) {
         converter << file.rdbuf();
         data = converter.str();
     } catch (std::ifstream::failure fail) {
-        fmt::print("< ERROR > Failed to read IES data.\n{}\n", fail.what());
+        fmt::print(fmt::fg(fmt::color::red), "< ERROR > Failed to read IES data.\n{}\n", fail.what());
     }
+
     filename = std::string(path);
     lines    = split_data(std::string_view(data), "\n");
 
@@ -86,4 +87,19 @@ std::optional<TILT_Data>& IES_Document::get_tilt_data() {
 
 const std::vector<std::string_view>::const_iterator IES_Document::end_of_document() const {
     return lines.cend();
+}
+
+std::string IES_Document::get_unit_type() const {
+    return luminaire_data.unit_type == IES_UnitType::Feet ? "Feet" : "Meters";
+}
+
+std::string IES_Document::get_photometric_type() const {
+    switch (photometric_data.photometric_type) {
+    case IES_PhotoType::TypeA:
+        return "Type A";
+    case IES_PhotoType::TypeB:
+        return "Type B";
+    default:
+        return "Type C";
+    }
 }

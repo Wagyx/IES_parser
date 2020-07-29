@@ -6,7 +6,6 @@ public:
     void parse(IES_Document& document) override {
         if (document.get_standard() == "IES 1986") {
             //Do the parsing
-            fmt::print("Parsing as {}\n", document.get_standard());
             parse_process(document);
         } else {
             fmt::print("< ERROR > Cannot parse this document.\n");

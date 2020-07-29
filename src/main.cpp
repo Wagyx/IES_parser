@@ -5,6 +5,7 @@ namespace po = boost::program_options;
 
 #include "classes/custom_formatter.hpp"
 #include "classes/ies_parser.hpp"
+#include "classes/ies_printer.hpp"
 
 int main(int argc, char* argv[]) {
     IES_Parser parser;
@@ -29,7 +30,7 @@ int main(int argc, char* argv[]) {
 
             IES_Document doc(c);
             parser.parse(doc);
-
+            IES_Printer::print(doc);
         } else {
             fmt::print("No target to parse was specified.\n");
         }
