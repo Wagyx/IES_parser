@@ -14,6 +14,7 @@
 #include <fmt/format.h>
 #include <fmt/color.h>
 
+#include "label_data.hpp"
 
 enum struct IES_Standard : unsigned int { IES86 = 3,
                                           IES91 = 2,
@@ -49,14 +50,14 @@ struct Luminaire_Data {
     float        lum_length;
     float        lum_height;
     IES_UnitType unit_type;
-    float         input_watts;
+    float        input_watts;
 };
 
 struct Photometric_Data {
-    float         candela_multiplier;
-    unsigned int  vertical_angles;
-    unsigned int  horizontal_angles;
-    IES_PhotoType photometric_type;
+    float              candela_multiplier;
+    unsigned int       vertical_angles;
+    unsigned int       horizontal_angles;
+    IES_PhotoType      photometric_type;
     std::vector<float> v_angles_list;
     std::vector<float> h_angles_list;
     std::vector<float> candela;
@@ -73,23 +74,23 @@ const std::unordered_map<std::string, IES_TILT> string_to_TILT_Value { { "NONE",
 class IES_Document
 {
 public:
-    std::string                                                         filename;
-    std::unordered_map<std::string_view, std::vector<std::string_view>> labels; //  TODO: it would be nice to have a wrapper around this
-    IES_TILT                                                            tilt;
-    Luminaire_Data                                                      luminaire_data;
-    Photometric_Data                                                    photometric_data;
-    Ballast_Data                                                        ballast_data;
+    std::string      filename;
+    Label_Data   labels; //  TODO: it would be nice to have a wrapper around this
+    IES_TILT         tilt;
+    Luminaire_Data   luminaire_data;
+    Photometric_Data photometric_data;
+    Ballast_Data     ballast_data;
 
     IES_Document(std::string& path);
 
     const std::vector<std::string_view>::const_iterator end_of_document() const;
-    [[nodiscard]] const std::string                    get_standard() const;
-    [[nodiscard]] const std::vector<std::string_view>& get_lines() const;
-    [[nodiscard]] const bool                           has_tilt() const;
-    [[nodiscard]] std::string                          get_unit_type() const;
-    [[nodiscard]] std::string                          get_photometric_type() const;
-    [[nodiscard]] std::optional<TILT_Data>&            get_tilt_data();
-    [[nodiscard]] std::string_view                     operator[](unsigned int line) const;
+    [[nodiscard]] const std::string                     get_standard() const;
+    [[nodiscard]] const std::vector<std::string_view>&  get_lines() const;
+    [[nodiscard]] const bool                            has_tilt() const;
+    [[nodiscard]] std::string                           get_unit_type() const;
+    [[nodiscard]] std::string                           get_photometric_type() const;
+    [[nodiscard]] std::optional<TILT_Data>&             get_tilt_data();
+    [[nodiscard]] std::string_view                      operator[](unsigned int line) const;
 
 private:
     static constexpr std::array<const char*, 3> format_identifier { "IESNA:LM-63-2002", "IESNA:LM-63-1995", "IESNA91" };

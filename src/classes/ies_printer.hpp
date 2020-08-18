@@ -67,13 +67,10 @@ private:
     }
 
 
-    static void print_labels(std::unordered_map<std::string_view, std::vector<std::string_view>> labels) {
-        for (const auto& [key, values] : labels) {
+    static void print_labels(Label_Data labels) {
+        for (const auto& key: labels.keys()) {
             print_key(std::string(key));
-            auto        it = values.begin();
-            std::string value(*it);
-            std::for_each(std::next(it), values.end(), [&](auto sv) { value += " " + std::string(sv); });
-            print_value(value);
+            print_value(labels[key]);
             fmt::print("\n");
         }
     }

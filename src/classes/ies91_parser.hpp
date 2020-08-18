@@ -38,7 +38,7 @@ public:
                 }
             }
 
-            document.labels.emplace(key, values);
+            document.labels.emplace(std::move(key), values);
         }
 
         assert(document.labels.count("TEST") > 0);

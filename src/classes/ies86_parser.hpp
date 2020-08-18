@@ -53,7 +53,7 @@ public:
                 clean(first_value);
                 clean(date_value);
                 values.push_back(date_value);
-                document.labels.emplace(date, values);
+                document.labels.emplace(std::move(date), values);
                 values.clear();
             }
 
@@ -66,7 +66,7 @@ public:
                 values.push_back(std::move(v_continue));
             }
 
-            document.labels.emplace(key, values);
+            document.labels.emplace(std::move(key), values);
         }
 
         if (document.labels.empty()) {
