@@ -11,8 +11,13 @@ int main(int argc, char* argv[]) {
     IES_Parser parser;
     try {
         po::options_description descr("Allowed options:");
-        descr.add_options()("help", "producing help message")("target", po::value<std::string>(), "specifying the file to be parsed")("print-to", po::value<std::string>(), "specifying where the parsing result should be printed to");
-
+        //  clangformat off
+        descr.add_options()
+            ("help", "producing help message")
+            ("target", po::value<std::string>(), "specifying the file to be parsed")
+            ("print-to", po::value<std::string>(), "specifying where the parsing result should be printed to")
+            ("printable,P", "print candela values to <target>.csv");
+        //  clangformat on
         po::positional_options_description target;
         target.add("target", 1);
 
@@ -30,7 +35,11 @@ int main(int argc, char* argv[]) {
 
             IES_Document doc(c);
             parser.parse(doc);
-            IES_Printer::print(doc);
+            if (varMap.count("printable") > 0) {
+                IES_Printer::print(doc, true);
+            } else {
+                IES_Printer::print(doc);
+            }
         } else {
             fmt::print("No target to parse was specified.\n");
         }

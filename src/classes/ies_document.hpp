@@ -75,7 +75,7 @@ class IES_Document
 {
 public:
     std::string      filename;
-    Label_Data   labels; //  TODO: it would be nice to have a wrapper around this
+    Label_Data       labels;
     IES_TILT         tilt;
     Luminaire_Data   luminaire_data;
     Photometric_Data photometric_data;

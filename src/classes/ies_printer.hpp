@@ -1,6 +1,8 @@
 #pragma once
 #include <fstream>
 
+#include <fmt/ostream.h>
+
 #include "ies_document.hpp"
 
 class IES_Printer
@@ -82,21 +84,20 @@ private:
             candela_file.open(path, std::ios_base::out | std::ios_base::trunc);
             unsigned int columns = h_angles.size();
             
-            std::string output = fmt::format("{:8},", "");
-            
+            fmt::print(candela_file, "{:8},", "");
+
             for (auto h : h_angles) {
-                output += fmt::format("{:8.4f},", h);
-            }
-            output += fmt::format("\n");
-            for (auto v : v_angles) {
-                output += fmt::format("{:8.4f},", v);
-                for (unsigned int i = 0; i < columns; ++i) {
-                    output += fmt::format("{:8.4f},", values[i]);
-                }
-                output += fmt::format("\n");
+                fmt::print(candela_file, "{:8.4f},", h);
             }
 
-            candela_file << output;
+            fmt::print(candela_file, "\n");
+            for (auto v : v_angles) {
+                fmt::print(candela_file, "{:8.4f},", v);
+                for (unsigned int i = 0; i < columns; ++i) {
+                    fmt::print(candela_file, "{:8.4f},", values[i]);
+                }
+                fmt::print(candela_file, "\n");
+            }
             candela_file.close();
         } catch (std::fstream::failure fail) {
             fmt::print(fmt::fg(fmt::color::red), "< ERROR > Failed to print candela values to csv.\n{}\n", fail.what());
