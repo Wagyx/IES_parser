@@ -22,11 +22,11 @@ void IES_Document::read_IES(const char* path) {
     unsigned int i;
     for (i = 0; i < 3; ++i) {
         if (lines[0] == format_identifier[i]) {
-            standard = IES_Standard(i);
+            standard = IES_Standard(i+1);
             return;
         }
     }
-    standard = IES_Standard(i);
+    standard = IES_Standard(0);
     return;
 }
 

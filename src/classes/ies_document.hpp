@@ -16,10 +16,10 @@
 
 #include "label_data.hpp"
 
-enum struct IES_Standard : unsigned int { IES86 = 3,
-                                          IES91 = 2,
-                                          IES95 = 1,
-                                          IES02 = 0 };
+enum struct IES_Standard : unsigned int { IES86 = 0,
+                                          IES91 = 1,
+                                          IES95 = 2,
+                                          IES02 = 3 };
 
 enum struct IES_TILT : unsigned char { NONE      = 0,
                                        INCLUDE   = 1,
