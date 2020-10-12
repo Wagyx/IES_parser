@@ -147,11 +147,11 @@ private:
         unsigned int v { document.photometric_data.vertical_angles };
         unsigned int h { document.photometric_data.horizontal_angles };
         std::vector<float> data = parse_elements<float>(v + h + v * h, header_line + 2, document);
-        std::transform(data.begin(), data.end(), data.begin(),
-            [&](auto x) { return x * document.photometric_data.candela_multiplier * document.ballast_data.b_factor * document.ballast_data.b_lamp_factor; });
         std::move(data.begin(), data.begin() + v, std::back_inserter(document.photometric_data.v_angles_list));
         std::move(data.begin() + v, data.begin() + v + h, std::back_inserter(document.photometric_data.h_angles_list));
         std::move(data.begin() + v + h, data.end(), std::back_inserter(document.photometric_data.candela));
+        std::transform(document.photometric_data.candela.begin(), document.photometric_data.candela.end(), document.photometric_data.candela.begin(),
+            [&](auto x) { return x * document.photometric_data.candela_multiplier * document.ballast_data.b_factor * document.ballast_data.b_lamp_factor; });
 
     }
 };
